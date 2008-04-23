@@ -5,11 +5,50 @@ use strict;
 
 =head1 NAME
 
-Config::JFDI - 
+Config::JFDI - Just * Do it: A Catalyst::Plugin::ConfigLoader-style layer over Config::Any
 
 =head1 VERSION
 
 Version 0.01
+
+=head1 SYNPOSIS 
+
+    use Config::JFDI;
+
+    my $config = Config::JFDI->new(name => "my_application", path => "path/to/my/application");
+    my $config_hash = $config->get;
+
+This will look for something like (depending on what Config::Any will find):
+
+    path/to/my/application/my_application_local.{yml,yaml,cnf,conf,jsn,json,...} AND
+
+    path/to/my/application/my_application.{yml,yaml,cnf,conf,jsn,json,...}
+
+And load the found configuration information appropiately, with _local taking precedence.
+
+    # You can also specify a file directly:
+
+    my $config = Config::JFDI->new(file => "/path/to/my/application/my_application.cnf");
+
+    # To later reload your configuration, fresh from disk:
+    
+    $config->reload;
+
+=head1 DESCRIPTION
+
+Config::JFDI is an implementation of L<Catalyst::Plugin::ConfigLoader> that exists outside of L<Catalyst>.
+
+Essentially, Config::JFDI will scan a directory for files matching a certain name. If such a file is found which also matches an extension
+that Config::Any can read, then the configuration from that file will be loaded.
+
+Config::JFDI will also look for special files that end with a "_local" suffix. Files with this special suffix will take
+precedence over any other existing configuration file, if any. The precedence takes place by merging the local configuration with the
+"standard" configuration via L<Hash::Merge::Simple>.
+
+Finally, you can override/modify the path search from outside your application, by setting the <NAME>_CONFIG variable outside your application (where <NAME>
+is the uppercase version of what you passed to Config::JFDI->new).
+
+=head1 METHODS
 
 =cut
 
@@ -19,6 +58,7 @@ use Moose;
 use Path::Class;
 use Config::Any;
 use List::MoreUtils qw/any/;
+use Hash::Merge::Simple;
 use Carp::Clan;
 use Clone qw//;
 
@@ -26,44 +66,15 @@ has name => qw/is ro isa Str/; # Actually, required unless ->file is given
 has path => qw/is ro isa Str/, default => "./"; # Can actually be a path (./my/, ./my) OR a bonafide file (i.e./my.yaml)
 has driver => qw/is ro required 1 lazy 1/, default => sub { {} };
 has local_suffix => qw/is ro required 1 lazy 1/, default => "local";
-
-has loaded => qw/is ro required 1/, default => 0;
+has no_env => qw/is ro required 1/, default => 0;
 has load_once => qw/is ro required 1/, default => 1;
 
+has loaded => qw/is ro required 1/, default => 0;
 has _config => qw/is ro required 1 lazy 1/, default => sub { {} };
 
 # TODO Maybe in the... future-ure-ure-ure...
 #has driver_name => qw/is ro isa Str/;
 #has driver_class => qw/is ro isa Str/;
-
-# TODO Put into Hash::Merge::Simple
-# Merge with right-most precedence
-sub _merge (@);
-sub _merge (@) {
-    my ($left, @right) = @_;
-
-    return $left unless @right;
-
-    return _merge($left, _merge(@right)) if @right > 1;
-
-    my ($right) = @right;
-
-    my %merge = %$left;
-
-    for my $key (keys %$right) {
-        my $hr = (ref $right->{$key} || '') eq 'HASH';
-        my $hl  = ((exists $left->{$key} && ref $left->{$key}) || '') eq 'HASH';
-
-        if ($hr and $hl){
-            $merge{$key} = _merge($left->{$key}, $right->{$key});
-        }
-        else {
-            $merge{$key} = $right->{$key};
-        }
-    }
-    
-    return \%merge;
-}
 
 sub _env(@) {
     my $name = uc join "_", @_;
@@ -71,11 +82,35 @@ sub _env(@) {
     return $ENV{$name};
 }
 
+=head2 my $config = Config::JFDI->new(...)
+
+You can configure the $config object by passing the following to new:
+
+    name                The name specifying the prefix of the configuration file to look for and 
+                        the ENV variable to read
+
+    path                The directory to search in
+
+    file                Directly read the configuration from this file. Config::Any must recognize
+                        the extension. Setting this will override path
+
+    local_suffix        The suffix to match when looking for a local configuration. "local" By default
+
+    no_env              Set this to 1 to disregard anything in the ENV. Off by default
+
+    driver              A hash consisting of Config:: driver information. This is passed directly through
+                        to Config::Any
+
+Returns a new Config::JFDI object
+
+=cut
+
 sub BUILD {
     my $self = shift;
     my $given = shift;
 
     if ($given->{file}) {
+        warn "Warning, overriding path setting with file (\"$given->{file}\" instead of \"$given->{path}\")" if $given->{path};
         $self->{path} = $given->{file};
     }
     elsif ($given->{name}) {
@@ -85,10 +120,17 @@ sub BUILD {
     }
 }
 
-sub clone {
-    my $self = shift;
-    return Clone::clone($self->config);
-}
+=head2 $config->get
+
+=head2 $config->config
+
+=head2 $config->load
+
+Load a config as specified by ->new(...) and ENV and return a hash
+
+These will only load the configuration once, so it's safe to call them multiple times without incurring any loading-time penalty
+
+=cut
 
 sub get {
     my $self = shift;
@@ -133,6 +175,27 @@ sub load {
     return $self->config;
 }
 
+=head2 $config->clone
+
+Return a clone of the configuration hash using L<Clone>
+
+This will load the configuration first, if it hasn't already
+
+=cut
+
+sub clone {
+    my $self = shift;
+    return Clone::clone($self->config);
+}
+
+=head2 $config->reload
+
+Reload the configuration, examining ENV and scanning the path anew
+
+Returns a hash of the configuration
+
+=cut 
+
 sub reload {
     my $self = shift;
     $self->{loaded} = 0;
@@ -145,7 +208,7 @@ sub _load {
 
     my ($file, $hash) = %$cfg;
 
-    $self->{_config} = _merge($self->_config, $hash);
+    $self->{_config} = Hash::Merge::Simple->merge($self->_config, $hash);
 }
 
 sub _load_files {
@@ -167,8 +230,8 @@ sub _find_files {
     
     my @files;
     if ($extension) {
-        # TODO C::P::ConfigLoader does a next here!
         # TODO Make sure DBIC can handle ->create({}) case ("INSERT INTO xyzzy () VALUES ()")
+        # FIXME C::P::ConfigLoader does a next here!
         croak "Can't handle file extension $extension" unless any { $_ eq $extension } @extensions;
         (my $local_path = $path) =~ s{\.$extension$}{_$local_suffix.$extension};
         push @files, $path, $local_path;
@@ -185,7 +248,7 @@ sub _get_path {
 
     my $name = $self->name;
     my $path;
-    $path = _env($name, 'CONFIG') if $name;
+    $path = _env($name, 'CONFIG') if $name && ! $self->no_env;
     $path ||= $self->path;
 
     # TODO Uhh, what if path is -d? 
@@ -204,7 +267,7 @@ sub _get_local_suffix {
 
     my $name = $self->name;
     my $suffix;
-    $suffix = _env($self->name, 'CONFIG_LOCAL_SUFFIX') if $name;
+    $suffix = _env($self->name, 'CONFIG_LOCAL_SUFFIX') if $name && ! $self->no_env;
     $suffix ||= $self->local_suffix;
 
     return $suffix;
@@ -219,6 +282,10 @@ sub _get_extensions {
 =head1 AUTHOR
 
 Robert Krimen, C<< <rkrimen at cpan.org> >>
+
+=head1 SEE ALSO
+
+L<Catalyst::Plugin::ConfigLoader>, L<Config::Any>, L<Catalyst>
 
 =head1 BUGS
 
