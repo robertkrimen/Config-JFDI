@@ -24,13 +24,13 @@ This will look for something like (depending on what Config::Any will find):
 
     path/to/my/application/my_application.{yml,yaml,cnf,conf,jsn,json,...}
 
-And load the found configuration information appropiately, with _local taking precedence.
+... and load the found configuration information appropiately, with _local taking precedence.
 
-    # You can also specify a file directly:
+You can also specify a file directly:
 
     my $config = Config::JFDI->new(file => "/path/to/my/application/my_application.cnf");
 
-    # To later reload your configuration, fresh from disk:
+To later reload your configuration, fresh from disk:
     
     $config->reload;
 
