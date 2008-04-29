@@ -9,7 +9,7 @@ Config::JFDI - Just * Do it: A Catalyst::Plugin::ConfigLoader-style layer over C
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNPOSIS 
 
@@ -52,7 +52,7 @@ is the uppercase version of what you passed to Config::JFDI->new).
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Moose;
 use Path::Class;
@@ -60,13 +60,16 @@ use Config::Any;
 use List::MoreUtils qw/any/;
 use Hash::Merge::Simple;
 use Carp::Clan;
+use Sub::Install;
 use Clone qw//;
 
 has name => qw/is ro isa Str/; # Actually, required unless ->file is given
 has path => qw/is ro isa Str/, default => "./"; # Can actually be a path (./my/, ./my) OR a bonafide file (i.e./my.yaml)
+has package => qw/is ro isa Str/;
 has driver => qw/is ro required 1 lazy 1/, default => sub { {} };
 has local_suffix => qw/is ro required 1 lazy 1/, default => "local";
 has no_env => qw/is ro required 1/, default => 0;
+has env_lookup => qw/is ro/, default => sub { [] };
 has load_once => qw/is ro required 1/, default => 1;
 
 has loaded => qw/is ro required 1/, default => 0;
@@ -78,6 +81,7 @@ has _config => qw/is ro required 1 lazy 1/, default => sub { {} };
 
 sub _env(@) {
     my $name = uc join "_", @_;
+    $name =~ s/::/_/g;
     $name =~ s/\W/_/g;
     return $ENV{$name};
 }
@@ -87,7 +91,10 @@ sub _env(@) {
 You can configure the $config object by passing the following to new:
 
     name                The name specifying the prefix of the configuration file to look for and 
-                        the ENV variable to read
+                        the ENV variable to read. This can be a package name. In any case,
+                        :: will be substituted with _ in <name> and the result will be lowercased.
+
+                        To prevent modification of <name>, pass it in as a scalar reference.
 
     path                The directory to search in
 
@@ -96,10 +103,16 @@ You can configure the $config object by passing the following to new:
 
     local_suffix        The suffix to match when looking for a local configuration. "local" By default
 
+    env_lookup          Additional ENV to check if $ENV{<NAME>...} is not found
+
     no_env              Set this to 1 to disregard anything in the ENV. Off by default
 
     driver              A hash consisting of Config:: driver information. This is passed directly through
                         to Config::Any
+
+    install_accessor    Set this to 1 to install a Catalyst-style accessor as <name>::config
+                        You can also specify the package name directly by setting install_accessor to it 
+                        (e.g. install_accessor => "My::Application")
 
 Returns a new Config::JFDI object
 
@@ -113,10 +126,34 @@ sub BUILD {
         warn "Warning, overriding path setting with file (\"$given->{file}\" instead of \"$given->{path}\")" if $given->{path};
         $self->{path} = $given->{file};
     }
-    elsif ($given->{name}) {
+    elsif (my $name = $given->{name}) {
+        if (ref $name eq "SCALAR") {
+            $self->{name} = $$name;
+        }
+        else {
+            $self->{package} = $name;
+            $name =~ s/::/_/g;
+            $self->{name} = lc $name;
+        }
     }
     else {
         croak "At minimum, either a name or a file is required";
+    }
+
+    if (defined $self->env_lookup) {
+        $self->{env_lookup} = [ $self->env_lookup ] unless ref $self->env_lookup eq "ARRAY";
+    }
+
+    if (my $package = $given->{install_accessor}) {
+        $package = $self->package if $package eq 1;
+        Sub::Install::install_sub({
+            code => sub {
+                return $self->config;
+            },
+            into => $self->package,
+            as => "config"
+        });
+
     }
 }
 
@@ -243,12 +280,31 @@ sub _find_files {
     return @files;
 }
 
+sub _env_lookup {
+    my $self = shift;
+    my @suffix = @_;
+
+    my $name = $self->name;
+    my $env_lookup = $self->env_lookup;
+    my @lookup;
+    push @lookup, $name if $name;
+    push @lookup, @$env_lookup;
+
+    for my $prefix (@lookup) {
+        my $value = _env($prefix, @suffix);
+        return $value if defined $value;
+    }
+    
+    return;
+}
+
 sub _get_path {
     my $self = shift;
 
     my $name = $self->name;
     my $path;
-    $path = _env($name, 'CONFIG') if $name && ! $self->no_env;
+#    $path = _env($name, 'CONFIG') if $name && ! $self->no_env;
+    $path = $self->_env_lookup('CONFIG') unless $self->no_env;
     $path ||= $self->path;
 
     # TODO Uhh, what if path is -d? 
@@ -267,7 +323,8 @@ sub _get_local_suffix {
 
     my $name = $self->name;
     my $suffix;
-    $suffix = _env($self->name, 'CONFIG_LOCAL_SUFFIX') if $name && ! $self->no_env;
+    $suffix = $self->_env_lookup('CONFIG_LOCAL_SUFFIX') unless $self->no_env;
+#    $suffix = _env($self->name, 'CONFIG_LOCAL_SUFFIX') if $name && ! $self->no_env;
     $suffix ||= $self->local_suffix;
 
     return $suffix;

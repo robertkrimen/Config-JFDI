@@ -1,2 +1,6 @@
+0.02 Monday April 28 19:51:17 PDT 2008: 
+ - Added env_lookup support
+ - Added install_accessor for Caelum
+
 0.01 Wednesday April 23 14:19:05 PDT 2008:
  - Initial release

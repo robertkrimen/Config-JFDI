@@ -12,6 +12,7 @@ requires 'Clone';
 requires 'List::MoreUtils';
 requires 'Moose';
 requires 'Path::Class';
+requires 'Sub::Install';
 
 auto_install;
 
