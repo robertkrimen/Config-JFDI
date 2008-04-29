@@ -9,7 +9,7 @@ Config::JFDI - Just * Do it: A Catalyst::Plugin::ConfigLoader-style layer over C
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNPOSIS 
 
@@ -52,7 +52,7 @@ is the uppercase version of what you passed to Config::JFDI->new).
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Moose;
 use Path::Class;
