@@ -26,4 +26,6 @@ t/assets/xyzzy_local.pl
 t/author/boilerplate.t
 t/author/pod-coverage.t
 t/author/pod.t
-
+t/14-loader-env-lookup.t
+t/15-install-accessor.t
+t/assets/xyzzy_catalyst.pl
