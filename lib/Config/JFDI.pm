@@ -150,7 +150,7 @@ sub BUILD {
             code => sub {
                 return $self->config;
             },
-            into => $self->package,
+            into => $package,
             as => "config"
         });
 
