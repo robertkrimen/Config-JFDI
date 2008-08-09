@@ -334,8 +334,6 @@ sub _get_extensions {
     return @{ Config::Any->extensions }
 }
 
-=head1 SYNOPSIS
-
 =head1 AUTHOR
 
 Robert Krimen, C<< <rkrimen at cpan.org> >>
@@ -343,6 +341,14 @@ Robert Krimen, C<< <rkrimen at cpan.org> >>
 =head1 SEE ALSO
 
 L<Catalyst::Plugin::ConfigLoader>, L<Config::Any>, L<Catalyst>
+
+=head1 SOURCE
+
+You can contribute or fork this project via GitHub:
+
+L<http://github.com/robertkrimen/config-jfdi/tree/master>
+
+    git clone git://github.com/robertkrimen/config-jfdi.git PACKAGE
 
 =head1 BUGS
 
