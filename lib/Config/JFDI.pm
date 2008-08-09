@@ -267,8 +267,6 @@ sub _find_files {
     
     my @files;
     if ($extension) {
-        # TODO Make sure DBIC can handle ->create({}) case ("INSERT INTO xyzzy () VALUES ()")
-        # FIXME C::P::ConfigLoader does a next here!
         croak "Can't handle file extension $extension" unless any { $_ eq $extension } @extensions;
         (my $local_path = $path) =~ s{\.$extension$}{_$local_suffix.$extension};
         push @files, $path, $local_path;
