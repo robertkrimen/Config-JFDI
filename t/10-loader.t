@@ -14,6 +14,6 @@ is($config->get->{'view'},                           'View::TT::New');
 #is($config->get->{'foo_sub'},                       'x-y');
 is($config->get->{'foo_sub'},                        '__foo(x,y)__');
 #is($config->get->{'literal_macro'},                 '__DATA__');
-is($config->get->{'literal_macro'},                  '__literal(__DATA__)__');
+is($config->get->{'literal_macro'},                  '__DATA__');
 
 ok(1);

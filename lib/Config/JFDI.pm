@@ -61,19 +61,44 @@ use List::MoreUtils qw/any/;
 use Hash::Merge::Simple;
 use Carp::Clan;
 use Sub::Install;
+use Data::Visitor::Callback;
 use Clone qw//;
 
 has name => qw/is ro isa Str/; # Actually, required unless ->file is given
-has path => qw/is ro isa Str/, default => "./"; # Can actually be a path (./my/, ./my) OR a bonafide file (i.e./my.yaml)
+
+has path => qw/is ro isa Str default ./; # Can actually be a path (./my/, ./my) OR a bonafide file (i.e./my.yaml)
+
 has package => qw/is ro isa Str/;
-has driver => qw/is ro required 1 lazy 1/, default => sub { {} };
-has local_suffix => qw/is ro required 1 lazy 1/, default => "local";
+
+has driver => qw/is ro lazy_build 1/;
+sub _build_driver {
+    return {};
+}
+
+has local_suffix => qw/is ro required 1 lazy 1 default local/;
+
 has no_env => qw/is ro required 1/, default => 0;
+
 has env_lookup => qw/is ro/, default => sub { [] };
+
 has load_once => qw/is ro required 1/, default => 1;
 
 has loaded => qw/is ro required 1/, default => 0;
-has _config => qw/is ro required 1 lazy 1/, default => sub { {} };
+
+has substitution => qw/reader _substitution lazy_build 1 isa HashRef/;
+sub _build_substitution {
+    return {};
+}
+
+has path_to_dir => qw/is ro lazy_build 1 isa Str/;
+sub _build_path_to_dir {
+    my $self = shift;
+    return $self->config->{home} if $self->config->{home};
+    return $self->{path} if -d $self->{path};
+    return '.';
+}
+
+has _config => qw/is rw isa HashRef/;
 
 # TODO Maybe in the... future-ure-ure-ure...
 #has driver_name => qw/is ro isa Str/;
@@ -102,6 +127,7 @@ You can configure the $config object by passing the following to new:
                         the extension. Setting this will override path
 
     local_suffix        The suffix to match when looking for a local configuration. "local" By default
+                        ("config_local_suffix" will also work so as to be drop-in compatible with C::P::CL)
 
     env_lookup          Additional ENV to check if $ENV{<NAME>...} is not found
 
@@ -114,6 +140,9 @@ You can configure the $config object by passing the following to new:
                         You can also specify the package name directly by setting install_accessor to it 
                         (e.g. install_accessor => "My::Application")
 
+    substitution        A hash consisting of subroutines called during the substitution phase of configuration
+                        preparation. ("substitutions" will also work so as to be drop-in compatible with C::P::CL)
+
 Returns a new Config::JFDI object
 
 =cut
@@ -123,7 +152,7 @@ sub BUILD {
     my $given = shift;
 
     if ($given->{file}) {
-        warn "Warning, overriding path setting with file (\"$given->{file}\" instead of \"$given->{path}\")" if $given->{path};
+        carp "Warning, overriding path setting with file (\"$given->{file}\" instead of \"$given->{path}\")" if $given->{path};
         $self->{path} = $given->{file};
     }
     elsif (my $name = $given->{name}) {
@@ -142,6 +171,14 @@ sub BUILD {
 
     if (defined $self->env_lookup) {
         $self->{env_lookup} = [ $self->env_lookup ] unless ref $self->env_lookup eq "ARRAY";
+    }
+
+    if ($given->{config_local_suffix}) {
+        $self->{local_suffix} = $given->{config_local_suffix};
+    }
+
+    if ($given->{subsitutions}) {
+        $self->{substitution} = $given->{substitutions};
     }
 
     if (my $package = $given->{install_accessor}) {
@@ -190,31 +227,46 @@ sub load {
     if ($self->loaded && $self->load_once) {
         return $self->get;
     }
-    $self->{_config} = {};
-    my @files = $self->_find_files;
-    my $cfg_files = $self->_load_files(\@files);
-    my %cfg_files = map { (%$_)[0] => $_ } reverse @$cfg_files;
 
-    my (@cfg, @local_cfg);
+    $self->_config({});
+
     {
-        # Anything that is local takes precedence
-        my $local_suffix = $self->_get_local_suffix;
-        for (sort keys %cfg_files) {
+        my @files = $self->_find_files;
+        my $cfg_files = $self->_load_files(\@files);
+        my %cfg_files = map { (%$_)[0] => $_ } reverse @$cfg_files;
 
-            my $cfg = $cfg_files{$_};
+        my (@cfg, @local_cfg);
+        {
+            # Anything that is local takes precedence
+            my $local_suffix = $self->_get_local_suffix;
+            for (sort keys %cfg_files) {
 
-            if (m{$local_suffix\.}ms) {
-                push @local_cfg, $cfg;
-            }
-            else {
-                push @cfg, $cfg;
+                my $cfg = $cfg_files{$_};
+
+                if (m{$local_suffix\.}ms) {
+                    push @local_cfg, $cfg;
+                }
+                else {
+                    push @cfg, $cfg;
+                }
             }
         }
+
+        $self->_load($_) for @cfg, @local_cfg;
     }
 
-    $self->_load($_) for @cfg, @local_cfg;
-
     $self->{loaded} = 1;
+
+    {
+        my $visitor = Data::Visitor::Callback->new(
+            plain_value => sub {
+                return unless defined $_;
+                $self->substitute($_);
+            }
+        );
+        $visitor->visit($self->config);
+
+    }
 
     return $self->config;
 }
@@ -244,6 +296,53 @@ sub reload {
     my $self = shift;
     $self->{loaded} = 0;
     return $self->load;
+}
+
+=head2 $config->substitute( <value>, <value>, ... )
+
+For each given <value>, if <value> looks like a substitution specification, then run
+the substitution macro on <value> and store the result.
+
+There are three default substitutions (the same as L<Catalyst::Plugin::ConfigLoader>)
+
+=over 4
+
+=item * C<__HOME__> - replaced with C<$c-E<gt>path_to('')>
+
+=item * C<__path_to(foo/bar)__> - replaced with C<$c-E<gt>path_to('foo/bar')>
+
+=item * C<__literal(__FOO__)__> - leaves __FOO__ alone (allows you to use
+C<__DATA__> as a config value, for example)
+
+=back
+
+The parameter list is split on comma (C<,>).
+
+=cut
+
+sub substitute {
+    my $self = shift;
+
+    my $substitution = $self->_substitution;
+    $substitution->{ HOME }    ||= sub { shift->path_to( '' ); };
+    $substitution->{ path_to } ||= sub { shift->path_to( @_ ); };
+    $substitution->{ literal } ||= sub { return $_[ 1 ]; };
+    my $matcher = join( '|', keys %$substitution );
+
+    for ( @_ ) {
+        s{__($matcher)(?:\((.+?)\))?__}{ $substitution->{ $1 }->( $self, $2 ? split( /,/, $2 ) : () ) }eg;
+    }
+}
+
+sub path_to {
+    my $self = shift;
+    my @path = @_;
+
+    my $path_to_dir = $self->path_to_dir;
+    my $path = Path::Class::Dir->new($self->path_to_dir);
+
+    if ( -d $path ) { return $path }
+    else { return Path::Class::File->new( $path_to_dir, @path ) }
 }
 
 sub _load {
