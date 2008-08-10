@@ -171,36 +171,43 @@ These will only load the configuration once, so it's safe to call them multiple 
 
 sub get {
     my $self = shift;
+
     my $config = $self->config;
     return $config;
-    # TODO Expand to allow dotted key access
+    # TODO Expand to allow dotted key access (?)
 }
 
 sub config {
     my $self = shift;
+
     return $self->_config if $self->loaded;
     return $self->load;
 }
 
 sub load {
     my $self = shift;
+
     if ($self->loaded && $self->load_once) {
         return $self->get;
     }
     $self->{_config} = {};
     my @files = $self->_find_files;
-    my $cfg = $self->_load_files(\@files);
+    my $cfg_files = $self->_load_files(\@files);
+    my %cfg_files = map { (%$_)[0] => $_ } reverse @$cfg_files;
 
     my (@cfg, @local_cfg);
     {
         # Anything that is local takes precedence
         my $local_suffix = $self->_get_local_suffix;
-        for (@$cfg) {
-            if ((keys %$_)[0] =~ m{$local_suffix\.}xms) {
-                push @local_cfg, $_;
+        for (sort keys %cfg_files) {
+
+            my $cfg = $cfg_files{$_};
+
+            if (m{$local_suffix\.}ms) {
+                push @local_cfg, $cfg;
             }
             else {
-                push @cfg, $_;
+                push @cfg, $cfg;
             }
         }
     }
