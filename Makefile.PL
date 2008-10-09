@@ -3,6 +3,8 @@ use inc::Module::Install;
 name 'Config-JFDI';
 all_from 'lib/Config/JFDI.pm';
 
+resources repository => 'http://github.com/robertkrimen/config-jfdi/tree/master';
+
 {
     require ExtUtils::MakeMaker;
     use strict;
@@ -35,6 +37,10 @@ Data::Visitor
 _END_
 }
 
+if (-e 'inc/.author') {
+    my $all_from = join '/', 'lib', split m/-/, name . '.pm';
+    `perldoc -tF $all_from > README` if ! -e 'README' || (stat $all_from)[9] > (stat 'README')[9];
+}
 
 auto_install;
 

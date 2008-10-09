@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 use Test::More;
 
 plan skip_all => "Config::General is required for this test" unless eval "require Config::General;";

@@ -90,8 +90,13 @@ sub _build_substitution {
     return {};
 }
 
-has path_to_dir => qw/is ro lazy_build 1 isa Str/;
-sub _build_path_to_dir {
+has default => qw/is ro lazy_build 1 isa HashRef/;
+sub _build_default {
+    return {};
+}
+
+has path_to => qw/reader _path_to lazy_build 1 isa Str/;
+sub _build_path_to {
     my $self = shift;
     return $self->config->{home} if $self->config->{home};
     return $self->{path} if -d $self->{path};
@@ -140,8 +145,14 @@ You can configure the $config object by passing the following to new:
                         You can also specify the package name directly by setting install_accessor to it 
                         (e.g. install_accessor => "My::Application")
 
-    substitution        A hash consisting of subroutines called during the substitution phase of configuration
+    substitute          A hash consisting of subroutines called during the substitution phase of configuration
                         preparation. ("substitutions" will also work so as to be drop-in compatible with C::P::CL)
+                        A substitution subroutine has the following signature: ($config, [ $argument1, $argument2, ... ])
+
+    path_to             The path to dir to use for the __path_to(...)__ substitution. If nothing is given, then the 'home'
+                        config value will be used ($config->get->{home}). Failing that, the current directory will be used.
+
+    default             A hash filled with default keys/values
 
 Returns a new Config::JFDI object
 
@@ -177,8 +188,11 @@ sub BUILD {
         $self->{local_suffix} = $given->{config_local_suffix};
     }
 
-    if ($given->{subsitutions}) {
-        $self->{substitution} = $given->{substitutions};
+    for (qw/substitute substitutes substitutions substitution/) {
+        if ($given->{$_}) {
+            $self->{substitution} = $given->{$_};
+            last;
+        }
     }
 
     if (my $package = $given->{install_accessor}) {
@@ -228,7 +242,7 @@ sub load {
         return $self->get;
     }
 
-    $self->_config({});
+    $self->_config($self->default);
 
     {
         my @files = $self->_find_files;
@@ -318,6 +332,8 @@ C<__DATA__> as a config value, for example)
 
 The parameter list is split on comma (C<,>).
 
+You can define your own substitutions by supplying the substitute option to ->new
+
 =cut
 
 sub substitute {
@@ -338,11 +354,15 @@ sub path_to {
     my $self = shift;
     my @path = @_;
 
-    my $path_to_dir = $self->path_to_dir;
-    my $path = Path::Class::Dir->new($self->path_to_dir);
+    my $path_to = $self->_path_to;
 
-    if ( -d $path ) { return $path }
-    else { return Path::Class::File->new( $path_to_dir, @path ) }
+    my $path = Path::Class::Dir->new( $path_to, @path );
+    if ( -d $path ) {
+        return $path;
+    }
+    else {
+        return Path::Class::File->new( $path_to, @path );
+    }
 }
 
 sub _load {
