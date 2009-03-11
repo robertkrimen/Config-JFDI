@@ -4,6 +4,7 @@ use warnings;
 use Test::Most;
 plan qw/no_plan/;
 
+use Path::Class;
 use Config::JFDI;
 
 my $config = Config::JFDI->new(
@@ -20,8 +21,7 @@ my $config = Config::JFDI->new(
 
 ok($config->get);
 
-is($config->get->{default}, "a-galaxy-far-far-away/");
+is($config->get->{default}, dir('a-galaxy-far-far-away/'));
 is($config->get->{default_override}, "Literally, this!");
 is($config->get->{original}, 4);
 is($config->get->{original_embed}, "2 + 2 = 4");
-
