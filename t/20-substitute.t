@@ -21,7 +21,8 @@ my $config = Config::JFDI->new(
 
 ok($config->get);
 
-is($config->get->{default}, dir('a-galaxy-far-far-away/'));
+#is($config->get->{default}, dir('a-galaxy-far-far-away/'));
+is($config->get->{default}, file('a-galaxy-far-far-away', '')); # Not dir because path_to treats a non-existent directory as a file
 is($config->get->{default_override}, "Literally, this!");
 is($config->get->{original}, 4);
 is($config->get->{original_embed}, "2 + 2 = 4");
