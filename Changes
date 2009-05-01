@@ -1,16 +1,19 @@
+0.06:
+    - Fixed t/14-loader-env-lookup.t to ignore external ENV (rt45624)
+
 0.05 Wednesday March 18 12:36:57 PDT 2009:
- - Modified tests to pass on Windows using Path::Class (thanks Dan Dascalescu)
+    - Modified tests to pass on Windows using Path::Class (thanks Dan Dascalescu)
 
 0.04 Thursday October 09 16:06:20 PDT 2008:
- - Added substitution handling
- - Added default option
+    - Added substitution handling
+    - Added default option
 
 0.03 Tuesday April 29 11:49:21 PDT 2008:
- - Fixed issue with install_accessor ignoring given package name
+    - Fixed issue with install_accessor ignoring given package name
 
 0.02 Monday April 28 19:51:17 PDT 2008: 
- - Added env_lookup support
- - Added install_accessor for Caelum
+    - Added env_lookup support
+    - Added install_accessor for Caelum
 
 0.01 Wednesday April 23 14:19:05 PDT 2008:
- - Initial release
+    - Initial release

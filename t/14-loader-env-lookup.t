@@ -6,6 +6,10 @@ plan qw/no_plan/;
 
 use Config::JFDI;
 
+eval {
+    delete $ENV{$_} for qw/CATALYST_CONFIG_LOCAL_SUFFIX/;
+};
+
 $ENV{CATALYST_CONFIG} = "t/assets/some_random_file.pl";
 
 my $config = Config::JFDI->new(qw{ name xyzzy path t/assets env_lookup CATALYST });
