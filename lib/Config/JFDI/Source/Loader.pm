@@ -1,4 +1,4 @@
-package Config::JFDI::Read::Any;
+package Config::JFDI::Source::Loader;
 
 use Moose;
 

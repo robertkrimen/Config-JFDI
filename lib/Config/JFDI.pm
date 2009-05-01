@@ -58,7 +58,7 @@ is the uppercase version of what you passed to Config::JFDI->new).
 
 use Moose;
 
-use Config::JFDI::Read::Any;
+use Config::JFDI::Source::Loader;
 
 use Path::Class;
 use Config::Any;
@@ -177,7 +177,7 @@ sub BUILD {
 
         $any{local_suffix} = $given->{config_local_suffix} if $given->{config_local_suffix};
 
-        $reader = Config::JFDI::Read::Any->new( %any );
+        $reader = Config::JFDI::Source::Loader->new( %any );
     }
 
     $self->{reader} = $reader;
