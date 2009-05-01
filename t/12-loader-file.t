@@ -25,11 +25,19 @@ sub has_Config_General {
 
 SKIP: {
     skip 'Config::General required' unless has_Config_General;
-    my $config = Config::JFDI->new(file => "t/assets/order/xyzzy.cnf");
+    my $config;
+    $config = Config::JFDI->new(file => "t/assets/order/xyzzy.cnf");
 
     cmp_deeply( $config->get, {
         cnf => 1,
         last => 'local_cnf',
         local_cnf => 1,
+    } );
+
+    $config = Config::JFDI->new(file => "t/assets/order/xyzzy.cnf", no_local => 1);
+
+    cmp_deeply( $config->get, {
+        cnf => 1,
+        last => 'cnf',
     } );
 }

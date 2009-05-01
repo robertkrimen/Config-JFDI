@@ -122,12 +122,14 @@ You can configure the $config object by passing the following to new:
     file                Directly read the configuration from this file. Config::Any must recognize
                         the extension. Setting this will override path
 
+    no_local            Disable lookup of a local configuration. The 'local_suffix' option will be ignored. Off by default
+
     local_suffix        The suffix to match when looking for a local configuration. "local" By default
                         ("config_local_suffix" will also work so as to be drop-in compatible with C::P::CL)
 
-    env_lookup          Additional ENV to check if $ENV{<NAME>...} is not found
+    no_env              Set this to 1 to disregard anything in the ENV. The 'env_lookup' option will be ignored. Off by default
 
-    no_env              Set this to 1 to disregard anything in the ENV. Off by default
+    env_lookup          Additional ENV to check if $ENV{<NAME>...} is not found
 
     driver              A hash consisting of Config:: driver information. This is passed directly through
                         to Config::Any
@@ -168,9 +170,13 @@ sub BUILD {
             name
             path
             driver
+
+            no_local
             local_suffix
+
             no_env
             env_lookup
+
         /) {
             $any{$_} = $given->{$_} if exists $given->{$_};
         }

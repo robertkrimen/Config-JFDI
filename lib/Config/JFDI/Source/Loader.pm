@@ -19,6 +19,8 @@ has local_suffix => qw/is ro required 1 lazy 1 default local/;
 
 has no_env => qw/is ro required 1/, default => 0;
 
+has no_local => qw/is ro required 1/, default => 0;
+
 has env_lookup => qw/is ro/, default => sub { [] };
 
 sub _env(@) {
@@ -72,7 +74,8 @@ sub read {
             }
         }
     }
-    return (@cfg, @local_cfg);
+
+    return $self->no_local ? @cfg : (@cfg, @local_cfg);
 }
 
 sub _load_files {
@@ -91,15 +94,20 @@ sub _find_files {
     my ($path, $extension) = $self->_get_path;
     my $local_suffix = $self->_get_local_suffix;
     my @extensions = $self->_get_extensions;
+    my $no_local = $self->no_local;
     
     my @files;
     if ($extension) {
         croak "Can't handle file extension $extension" unless any { $_ eq $extension } @extensions;
-        (my $local_path = $path) =~ s{\.$extension$}{_$local_suffix.$extension};
-        push @files, $path, $local_path;
+        push @files, $path;
+        unless ($no_local) {
+            (my $local_path = $path) =~ s{\.$extension$}{_$local_suffix.$extension};
+            push @files, $local_path;
+        }
     }
     else {
-        @files = map { ( "$path.$_", "${path}_${local_suffix}.$_" ) } @extensions;
+        push @files, map { "$path.$_" } @extensions;
+        push @files, map { "${path}_${local_suffix}.$_" } @extensions unless $no_local;
     }
 
     return @files;
