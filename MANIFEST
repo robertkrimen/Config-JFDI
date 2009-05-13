@@ -28,7 +28,6 @@ t/16-loader-order.t
 t/20-substitute.t
 t/21-path-to.t
 t/22-default.t
-t/assets/.default.pl.swp
 t/assets/default.pl
 t/assets/order/xyzzy.cnf
 t/assets/order/xyzzy.conf

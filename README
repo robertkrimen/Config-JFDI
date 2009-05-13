@@ -3,7 +3,7 @@ NAME
     layer over Config::Any
 
 VERSION
-    Version 0.05
+    Version 0.06
 
 SYNPOSIS
         use Config::JFDI;
@@ -49,6 +49,27 @@ DESCRIPTION
     application (where <NAME> is the uppercase version of what you passed to
     Config::JFDI->new).
 
+Behavior change of the 'file' parameter in 0.06
+    In previous versions, Config::JFDI would treat the file parameter as a
+    path parameter, stripping off the extension (ignoring it) and globbing
+    what remained against all the extensions that Config::Any could provide.
+    That is, it would do this:
+
+        Config::JFDI->new( file => 'xyzzy.cnf' );
+        # Transform 'xyzzy.cnf' into 'xyzzy.pl', 'xyzzy.yaml', 'xyzzy_local.pl', ... (depending on what Config::Any could parse)
+
+    This is probably not what people intended. Config::JFDI will now squeak
+    a warning if you pass 'file' through, but you can suppress the warning
+    with 'no_06_warning' or 'quiet_deprecation'
+
+        Config::JFDI->new( file => 'xyzzy.cnf', no_06_warning => 1 );
+        Config::JFDI->new( file => 'xyzzy.cnf', quiet_deprecation => 1 ); # More general
+
+    If you *do* want the original behavior, simply pass in the file
+    parameter as the path parameter instead:
+
+        Config::JFDI->new( path => 'xyzzy.cnf' ); # Will work as before
+
 METHODS
   my $config = Config::JFDI->new(...)
     You can configure the $config object by passing the following to new:
@@ -64,12 +85,14 @@ METHODS
         file                Directly read the configuration from this file. Config::Any must recognize
                             the extension. Setting this will override path
 
+        no_local            Disable lookup of a local configuration. The 'local_suffix' option will be ignored. Off by default
+
         local_suffix        The suffix to match when looking for a local configuration. "local" By default
                             ("config_local_suffix" will also work so as to be drop-in compatible with C::P::CL)
 
-        env_lookup          Additional ENV to check if $ENV{<NAME>...} is not found
+        no_env              Set this to 1 to disregard anything in the ENV. The 'env_lookup' option will be ignored. Off by default
 
-        no_env              Set this to 1 to disregard anything in the ENV. Off by default
+        env_lookup          Additional ENV to check if $ENV{<NAME>...} is not found
 
         driver              A hash consisting of Config:: driver information. This is passed directly through
                             to Config::Any
