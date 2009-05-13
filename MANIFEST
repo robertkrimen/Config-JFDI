@@ -4,6 +4,8 @@ META.yml # Will be created by "make dist"
 Makefile.PL
 README
 lib/Config/JFDI.pm
+lib/Config/JFDI/Carp.pm
+lib/Config/JFDI/Source/Loader.pm
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoInstall.pm
@@ -45,4 +47,3 @@ t/assets/xyzzy_local.pl
 t/release/boilerplate.t
 t/release/pod-coverage.t
 t/release/pod.t
-

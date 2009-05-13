@@ -9,11 +9,11 @@ Config::JFDI - Just * Do it: A Catalyst::Plugin::ConfigLoader-style layer over C
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNPOSIS 
 
@@ -52,6 +52,22 @@ precedence over any other existing configuration file, if any. The precedence ta
 Finally, you can override/modify the path search from outside your application, by setting the <NAME>_CONFIG variable outside your application (where <NAME>
 is the uppercase version of what you passed to Config::JFDI->new).
 
+=head1 Behavior change of the 'file' parameter in 0.06
+
+In previous versions, Config::JFDI would treat the file parameter as a path parameter, stripping off the extension (ignoring it) and globbing what remained against all the extensions that Config::Any could provide. That is, it would do this:
+
+    Config::JFDI->new( file => 'xyzzy.cnf' );
+    # Transform 'xyzzy.cnf' into 'xyzzy.pl', 'xyzzy.yaml', 'xyzzy_local.pl', ... (depending on what Config::Any could parse)
+
+This is probably not what people intended. Config::JFDI will now squeak a warning if you pass 'file' through, but you can suppress the warning with 'no_06_warning' or 'quiet_deprecation'
+
+    Config::JFDI->new( file => 'xyzzy.cnf', no_06_warning => 1 );
+    Config::JFDI->new( file => 'xyzzy.cnf', quiet_deprecation => 1 ); # More general
+
+If you *do* want the original behavior, simply pass in the file parameter as the path parameter instead:
+
+    Config::JFDI->new( path => 'xyzzy.cnf' ); # Will work as before
+
 =head1 METHODS
 
 =cut
@@ -59,11 +75,11 @@ is the uppercase version of what you passed to Config::JFDI->new).
 use Moose;
 
 use Config::JFDI::Source::Loader;
+use Config::JFDI::Carp;
 
 use Path::Class;
 use Config::Any;
 use Hash::Merge::Simple;
-use Carp::Clan;
 use Sub::Install;
 use Data::Visitor::Callback;
 use Clone qw//;
@@ -157,15 +173,16 @@ sub BUILD {
 
     $self->{package} = $given->{name} if defined $given->{name} && ! defined $self->{package} && ! ref $given->{name};
 
-    my $reader;
+    my ($reader, %reader);
     if ($given->{file}) {
+        carp "The behavior of the 'file' option has changed, pass in 'quiet_deprecation' or 'no_06_warning' to disable this warning"
+            unless $given->{quiet_deprecation} || $given->{no_06_warning};
         carp "Warning, overriding path setting with file (\"$given->{file}\" instead of \"$given->{path}\")" if $given->{path};
         $given->{path} = $given->{file};
-        # TODO Do ::Read parsing
+        $reader{path_is_file} = 1;
     }
 
     {
-        my %any;
         for (qw/
             name
             path
@@ -178,12 +195,14 @@ sub BUILD {
             env_lookup
 
         /) {
-            $any{$_} = $given->{$_} if exists $given->{$_};
+            $reader{$_} = $given->{$_} if exists $given->{$_};
         }
 
-        $any{local_suffix} = $given->{config_local_suffix} if $given->{config_local_suffix};
+        carp "Warning, 'local_suffix' will be ignored if 'file' is given, use 'path' instead" if exists $reader{local_suffix};
 
-        $reader = Config::JFDI::Source::Loader->new( %any );
+        $reader{local_suffix} = $given->{config_local_suffix} if $given->{config_local_suffix};
+
+        $reader = Config::JFDI::Source::Loader->new( %reader );
     }
 
     $self->{reader} = $reader;
@@ -259,7 +278,7 @@ sub load {
                 $self->substitute($_);
             }
         );
-        $visitor->visit($self->config);
+        $visitor->visit( $self->config );
 
     }
 

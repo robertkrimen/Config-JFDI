@@ -42,7 +42,4 @@ if (-e 'inc/.author') {
     `perldoc -tF $all_from > README` if ! -e 'README' || (stat $all_from)[9] > (stat 'README')[9];
 }
 
-auto_install;
-
 WriteAll;
-

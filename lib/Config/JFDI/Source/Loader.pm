@@ -23,6 +23,8 @@ has no_local => qw/is ro required 1/, default => 0;
 
 has env_lookup => qw/is ro/, default => sub { [] };
 
+has path_is_file => qw/is ro default 0/;
+
 sub _env(@) {
     my $key = uc join "_", @_;
     $key =~ s/::/_/g;
@@ -91,26 +93,34 @@ sub _load_files {
 sub _find_files {
     my $self = shift;
 
-    my ($path, $extension) = $self->_get_path;
-    my $local_suffix = $self->_get_local_suffix;
-    my @extensions = $self->_get_extensions;
-    my $no_local = $self->no_local;
-    
-    my @files;
-    if ($extension) {
-        croak "Can't handle file extension $extension" unless any { $_ eq $extension } @extensions;
-        push @files, $path;
-        unless ($no_local) {
-            (my $local_path = $path) =~ s{\.$extension$}{_$local_suffix.$extension};
-            push @files, $local_path;
-        }
+    if ($self->path_is_file) {
+        my $path;
+        $path = $self->_env_lookup('CONFIG') unless $self->no_env;
+        $path ||= $self->path;
+        return ($path);
     }
     else {
-        push @files, map { "$path.$_" } @extensions;
-        push @files, map { "${path}_${local_suffix}.$_" } @extensions unless $no_local;
-    }
+        my ($path, $extension) = $self->_get_path;
+        my $local_suffix = $self->_get_local_suffix;
+        my @extensions = $self->_get_extensions;
+        my $no_local = $self->no_local;
+        
+        my @files;
+        if ($extension) {
+            croak "Can't handle file extension $extension" unless any { $_ eq $extension } @extensions;
+            push @files, $path;
+            unless ($no_local) {
+                (my $local_path = $path) =~ s{\.$extension$}{_$local_suffix.$extension};
+                push @files, $local_path;
+            }
+        }
+        else {
+            push @files, map { "$path.$_" } @extensions;
+            push @files, map { "${path}_${local_suffix}.$_" } @extensions unless $no_local;
+        }
 
-    return @files;
+        return @files;
+    }
 }
 
 sub _env_lookup {

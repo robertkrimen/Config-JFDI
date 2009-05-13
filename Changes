@@ -1,6 +1,7 @@
 0.06:
     - Fixed t/14-loader-env-lookup.t to ignore external ENV (rt45624)
     - Require Data::Visitor 0.24 (rt45624)
+    - Changed how the 'file' option to work how the user actually expects it to (and how it is in the SYNOPSIS)
 
 0.05 Wednesday March 18 12:36:57 PDT 2009:
     - Modified tests to pass on Windows using Path::Class (thanks Dan Dascalescu)

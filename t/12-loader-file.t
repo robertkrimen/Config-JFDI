@@ -26,18 +26,34 @@ sub has_Config_General {
 SKIP: {
     skip 'Config::General required' unless has_Config_General;
     my $config;
-    $config = Config::JFDI->new(file => "t/assets/order/xyzzy.cnf");
 
+    $config = Config::JFDI->new( path => "t/assets/order/xyzzy.cnf" );
     cmp_deeply( $config->get, {
         cnf => 1,
         last => 'local_cnf',
         local_cnf => 1,
     } );
 
-    $config = Config::JFDI->new(file => "t/assets/order/xyzzy.cnf", no_local => 1);
-
+    $config = Config::JFDI->new( file => "t/assets/order/xyzzy.cnf" );
     cmp_deeply( $config->get, {
         cnf => 1,
         last => 'cnf',
+    } );
+
+    $config = Config::JFDI->new( path => "t/assets/order/xyzzy.cnf", no_local => 1 );
+    cmp_deeply( $config->get, {
+        cnf => 1,
+        last => 'cnf',
+    } );
+
+    warning_like { $config = Config::JFDI->new( file => "t/assets/order/xyzzy.cnf", ) }
+        qr/The behavior of the 'file' option has changed, pass in 'quiet_deprecation' or 'no_06_warning' to disable this warning/;
+
+    warning_is { $config = Config::JFDI->new( file => "t/assets/order/xyzzy.cnf", no_06_warning => 1 ) } '';
+
+    warning_is { $config = Config::JFDI->new( file => "t/assets/order/xyzzy.cnf", quiet_deprecation => 1 ) } '';
+
+    $config = Config::JFDI->new( file => "t/assets/file-does-not-exist.cnf" );
+    cmp_deeply( $config->get, {
     } );
 }
