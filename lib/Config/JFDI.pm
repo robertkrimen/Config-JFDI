@@ -123,7 +123,7 @@ sub _build_path_to {
 
 has _config => qw/is rw isa HashRef/;
 
-=head2 my $config = Config::JFDI->new(...)
+=head2 $config = Config::JFDI->new(...)
 
 You can configure the $config object by passing the following to new:
 
@@ -227,13 +227,29 @@ sub BUILD {
     }
 }
 
+=head2 $config_hash = Config::JFDI->open( ... )
+
+As an alternative way to load a config, ->open will pass given arguments to ->new( ... ), then attempt to do ->load
+
+Unlike ->get or ->load, if no configuration files are found, ->open will return undef (or the empty list)
+
+This is so you can do something like:
+
+    my $config_hash = Config::JFDI->open( "/path/to/application.cnf" ) or croak "Couldn't find config file!"
+
+In scalar context, ->open will return the config hash, NOT the config object. If you want the config object, call ->open in list context:
+
+    my ($config_hash, $config) = Config::JFDI->open( ... )
+
+You can pass any arguments to ->open that you would to ->new
+
 =head2 $config->get
 
 =head2 $config->config
 
 =head2 $config->load
 
-Load a config as specified by ->new(...) and ENV and return a hash
+Load a config as specified by ->new( ... ) and ENV and return a hash
 
 These will only load the configuration once, so it's safe to call them multiple times without incurring any loading-time penalty
 
@@ -244,6 +260,17 @@ Returns a list of files found
 If the list is empty, then no files were loaded/read
 
 =cut
+
+sub open {
+    if ( ! ref $_[0] ) {
+        my $class = shift;
+        return $class->new( no_06_warning => 1, 1 == @_ ? (file => $_[0]) : @_ )->open;
+    }
+    my $self = shift;
+    carp "You called ->open on an instantiated object with arguments" if @_;
+    return unless $self->found;
+    return wantarray ? ($self->get, $self) : $self->get;
+}
 
 sub get {
     my $self = shift;

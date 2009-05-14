@@ -71,7 +71,7 @@ Behavior change of the 'file' parameter in 0.06
         Config::JFDI->new( path => 'xyzzy.cnf' ); # Will work as before
 
 METHODS
-  my $config = Config::JFDI->new(...)
+  $config = Config::JFDI->new(...)
     You can configure the $config object by passing the following to new:
 
         name                The name specifying the prefix of the configuration file to look for and 
@@ -112,13 +112,36 @@ METHODS
 
     Returns a new Config::JFDI object
 
+  $config_hash = Config::JFDI->open( ... )
+    As an alternative way to load a config, ->open will pass given arguments
+    to ->new( ... ), then attempt to load the result object
+
+    Unlike ->get or ->load, if no configuration files are found, ->open will
+    return undef (or the empty list)
+
+    This is so you can do something like:
+
+        my $config_hash = Config::JFDI->open( "/path/to/application.cnf" ) or croak "Couldn't find config file!"
+
+    In scalar context, ->open will return the config hash, NOT the config
+    object. If you want the config object, call ->open in list context:
+
+        my ($config_hash, $config) = Config::JFDI->open( ... )
+
+    You can pass any arguments to ->open that you would to ->new
+
   $config->get
   $config->config
   $config->load
-    Load a config as specified by ->new(...) and ENV and return a hash
+    Load a config as specified by ->new( ... ) and ENV and return a hash
 
     These will only load the configuration once, so it's safe to call them
     multiple times without incurring any loading-time penalty
+
+  $config->found
+    Returns a list of files found
+
+    If the list is empty, then no files were loaded/read
 
   $config->clone
     Return a clone of the configuration hash using Clone
