@@ -1,4 +1,4 @@
-0.06:
+0.05_1 Wednesday May 13 19:36:19 PDT 2009:
     - Fixed t/14-loader-env-lookup.t to ignore external ENV (rt45624)
     - Require Data::Visitor 0.24 (rt45624)
     - Changed how the 'file' option to work how the user actually expects it to (and how it is in the SYNOPSIS)

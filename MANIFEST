@@ -25,6 +25,8 @@ t/13-loader-no-env.t
 t/14-loader-env-lookup.t
 t/15-install-accessor.t
 t/16-loader-order.t
+t/17-found.t
+t/18-open.t
 t/20-substitute.t
 t/21-path-to.t
 t/22-default.t
