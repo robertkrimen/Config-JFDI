@@ -86,7 +86,7 @@ use Clone qw//;
 
 has package => qw/is ro isa Str/;
 
-has reader => qw/is ro/, handles => [qw/ driver local_suffix no_env env_lookup path /];
+has source => qw/is ro/, handles => [qw/ driver local_suffix no_env env_lookup path found /];
 
 #has driver => qw/is ro lazy_build 1/;
 #sub _build_driver {
@@ -173,13 +173,13 @@ sub BUILD {
 
     $self->{package} = $given->{name} if defined $given->{name} && ! defined $self->{package} && ! ref $given->{name};
 
-    my ($reader, %reader);
+    my ($source, %source);
     if ($given->{file}) {
         carp "The behavior of the 'file' option has changed, pass in 'quiet_deprecation' or 'no_06_warning' to disable this warning"
             unless $given->{quiet_deprecation} || $given->{no_06_warning};
         carp "Warning, overriding path setting with file (\"$given->{file}\" instead of \"$given->{path}\")" if $given->{path};
         $given->{path} = $given->{file};
-        $reader{path_is_file} = 1;
+        $source{path_is_file} = 1;
     }
 
     {
@@ -195,17 +195,17 @@ sub BUILD {
             env_lookup
 
         /) {
-            $reader{$_} = $given->{$_} if exists $given->{$_};
+            $source{$_} = $given->{$_} if exists $given->{$_};
         }
 
-        carp "Warning, 'local_suffix' will be ignored if 'file' is given, use 'path' instead" if exists $reader{local_suffix};
+        carp "Warning, 'local_suffix' will be ignored if 'file' is given, use 'path' instead" if exists $source{local_suffix};
 
-        $reader{local_suffix} = $given->{config_local_suffix} if $given->{config_local_suffix};
+        $source{local_suffix} = $given->{config_local_suffix} if $given->{config_local_suffix};
 
-        $reader = Config::JFDI::Source::Loader->new( %reader );
+        $source = Config::JFDI::Source::Loader->new( %source );
     }
 
-    $self->{reader} = $reader;
+    $self->{source} = $source;
 
     for (qw/substitute substitutes substitutions substitution/) {
         if ($given->{$_}) {
@@ -237,6 +237,12 @@ Load a config as specified by ->new(...) and ENV and return a hash
 
 These will only load the configuration once, so it's safe to call them multiple times without incurring any loading-time penalty
 
+=head2 $config->found
+
+Returns a list of files found
+
+If the list is empty, then no files were loaded/read
+
 =cut
 
 sub get {
@@ -264,7 +270,7 @@ sub load {
     $self->_config($self->default);
 
     {
-        my @read = $self->reader->read;
+        my @read = $self->source->read;
 
         $self->_load($_) for @read;
     }

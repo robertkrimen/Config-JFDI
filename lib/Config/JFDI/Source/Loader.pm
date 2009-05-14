@@ -1,6 +1,7 @@
 package Config::JFDI::Source::Loader;
 
 use Moose;
+use MooseX::AttributeHelpers;
 
 use Config::Any;
 use Carp;
@@ -24,6 +25,10 @@ has no_local => qw/is ro required 1/, default => 0;
 has env_lookup => qw/is ro/, default => sub { [] };
 
 has path_is_file => qw/is ro default 0/;
+
+has _found => qw/metaclass Collection::Array is rw isa ArrayRef/, provides => {qw/
+    elements found
+/};
 
 sub _env(@) {
     my $key = uc join "_", @_;
@@ -59,6 +64,7 @@ sub read {
     my @files = $self->_find_files;
     my $cfg_files = $self->_load_files(\@files);
     my %cfg_files = map { (%$_)[0] => $_ } reverse @$cfg_files;
+    $self->_found( [ map { (%$_)[0] } @$cfg_files ] );
 
     my (@cfg, @local_cfg);
     {
@@ -80,6 +86,15 @@ sub read {
     return $self->no_local ? @cfg : (@cfg, @local_cfg);
 }
 
+around found => sub {
+    my $inner = shift;
+    my $self = shift;
+    
+    $self->read unless $self->{_found};
+
+    return $inner->( $self, @_ );
+};
+
 sub _load_files {
     my $self = shift;
     my $files = shift;
@@ -90,7 +105,7 @@ sub _load_files {
     });
 }
 
-sub _find_files {
+sub _find_files { # Doesn't really find files...hurm...
     my $self = shift;
 
     if ($self->path_is_file) {
