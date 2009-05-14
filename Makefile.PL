@@ -25,13 +25,14 @@ Test::Most
 _END_
 
     map { my ($pk, $vr) = split m/\s/; requires $pk => $vr || 0 } grep { ! /^\s*#/ } split m/\n/, <<_END_;
+Carp::Clan::Share
 Config::Any
-Carp::Clan
 Clone
 Data::Visitor 0.24
 Hash::Merge::Simple
 List::MoreUtils
 Moose
+MooseX::AttributeHelpers
 Path::Class
 Sub::Install
 _END_
