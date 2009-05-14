@@ -3,7 +3,7 @@ NAME
     layer over Config::Any
 
 VERSION
-    Version 0.06
+    Version 0.05_1
 
 SYNPOSIS
         use Config::JFDI;
@@ -114,7 +114,7 @@ METHODS
 
   $config_hash = Config::JFDI->open( ... )
     As an alternative way to load a config, ->open will pass given arguments
-    to ->new( ... ), then attempt to load the result object
+    to ->new( ... ), then attempt to do ->load
 
     Unlike ->get or ->load, if no configuration files are found, ->open will
     return undef (or the empty list)
