@@ -17,7 +17,7 @@ sub has_Config_General {
     ok( $config->get );
     ok( keys %{ $config->get } );
     ok( $config->found );
-    cmp_deeply( [ $config->found ], [ 't/assets/some_random_file.pl' ] );
+    cmp_deeply( [ $config->found ], bag( 't/assets/some_random_file.pl' ) );
 }
 
 {
@@ -25,7 +25,7 @@ sub has_Config_General {
     ok( $config->get );
     ok( keys %{ $config->get } );
     ok( $config->found );
-    cmp_deeply( [ $config->found ], [ 't/assets/xyzzy.pl', 't/assets/xyzzy_local.pl' ] );
+    cmp_deeply( [ $config->found ], bag( 't/assets/xyzzy.pl', 't/assets/xyzzy_local.pl' ) );
 }
 
 {
@@ -42,6 +42,6 @@ sub has_Config_General {
     ok( $config->found ); # Do ->read via ->found
     ok( $config->get );
     ok( keys %{ $config->get } );
-    cmp_deeply( [ $config->found ], [ 't/assets/some_random_file.pl' ] );
+    cmp_deeply( [ $config->found ], bag( 't/assets/some_random_file.pl' ) );
 }
 

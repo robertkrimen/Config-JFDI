@@ -1,3 +1,8 @@
+0.06 Wednesday May 20 14:44:51 PDT 2009:
+    - Non-developer release
+    - Fixed tests in 17-found.t to use bag() instead of [], since we can't depend on Config::Any
+      to return loaded files in a set order (srezic++)
+
 0.05_2 Thursday May 14 13:27:31 PDT 2009:
     - Forgot some dependencies in Makefile.PL
 

@@ -9,11 +9,11 @@ Config::JFDI - Just * Do it: A Catalyst::Plugin::ConfigLoader-style layer over C
 
 =head1 VERSION
 
-Version 0.05_2
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05_2';
+our $VERSION = '0.06';
 
 =head1 SYNPOSIS 
 
