@@ -1,31 +1,34 @@
-0.06 Wednesday May 20 14:44:51 PDT 2009:
+0.061 Thursday May 28 15:21:43 PDT 2009:
+    - Fix for path extension issue, thanks minty (http://github.com/minty)
+
+0.060 Wednesday May 20 14:44:51 PDT 2009:
     - Non-developer release
     - Fixed tests in 17-found.t to use bag() instead of [], since we can't depend on Config::Any
       to return loaded files in a set order (srezic++)
 
-0.05_2 Thursday May 14 13:27:31 PDT 2009:
+0.050_2 Thursday May 14 13:27:31 PDT 2009:
     - Forgot some dependencies in Makefile.PL
 
-0.05_1 Wednesday May 13 19:36:19 PDT 2009:
+0.050_1 Wednesday May 13 19:36:19 PDT 2009:
     - Fixed t/14-loader-env-lookup.t to ignore external ENV (rt45624)
     - Require Data::Visitor 0.24 (rt45624)
     - Changed how the 'file' option to work how the user actually expects it to (and how it is in the SYNOPSIS)
     - Added ->found
     - Added ->open 
 
-0.05 Wednesday March 18 12:36:57 PDT 2009:
+0.050 Wednesday March 18 12:36:57 PDT 2009:
     - Modified tests to pass on Windows using Path::Class (thanks Dan Dascalescu)
 
-0.04 Thursday October 09 16:06:20 PDT 2008:
+0.040 Thursday October 09 16:06:20 PDT 2008:
     - Added substitution handling
     - Added default option
 
-0.03 Tuesday April 29 11:49:21 PDT 2008:
+0.030 Tuesday April 29 11:49:21 PDT 2008:
     - Fixed issue with install_accessor ignoring given package name
 
-0.02 Monday April 28 19:51:17 PDT 2008: 
+0.020 Monday April 28 19:51:17 PDT 2008: 
     - Added env_lookup support
     - Added install_accessor for Caelum
 
-0.01 Wednesday April 23 14:19:05 PDT 2008:
+0.010 Wednesday April 23 14:19:05 PDT 2008:
     - Initial release

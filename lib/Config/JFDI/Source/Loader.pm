@@ -172,6 +172,13 @@ sub _get_extensions {
     return @{ Config::Any->extensions }
 }
 
+sub file_extension ($) {
+    my $path = shift;
+    return if -d $path; 
+    my ($extension) = $path =~ m{\.([^/\.]{1,4})$};
+    return $extension;
+}
+
 sub _get_path {
     my $self = shift;
 
@@ -181,9 +188,7 @@ sub _get_path {
     $path = $self->_env_lookup('CONFIG') unless $self->no_env;
     $path ||= $self->path;
 
-    # TODO Uhh, what if path is -d?
-    my ($extension) = ($path =~ m{\.(.{1,4})$})
-        if !-d $path;
+    my $extension = file_extension $path;
 
     if (-d $path) {
         $path =~ s{[\/\\]$}{}; # Remove any trailing slash, e.g. apple/ or apple\ => apple
