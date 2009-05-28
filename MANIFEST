@@ -14,6 +14,9 @@ inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
+inc/Module/AutoInstall.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Include.pm
 t/00-load.t
 t/10-loader.t
 t/11-loader-env.t
