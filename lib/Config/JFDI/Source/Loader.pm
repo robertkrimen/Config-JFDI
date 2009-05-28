@@ -181,8 +181,9 @@ sub _get_path {
     $path = $self->_env_lookup('CONFIG') unless $self->no_env;
     $path ||= $self->path;
 
-    # TODO Uhh, what if path is -d? 
-    my ($extension) = ($path =~ m{\.(.{1,4})$});
+    # TODO Uhh, what if path is -d?
+    my ($extension) = ($path =~ m{\.(.{1,4})$})
+        if !-d $path;
 
     if (-d $path) {
         $path =~ s{[\/\\]$}{}; # Remove any trailing slash, e.g. apple/ or apple\ => apple
