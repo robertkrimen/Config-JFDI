@@ -27,6 +27,15 @@ SKIP: {
     skip 'Config::General required' unless has_Config_General;
     my $config;
 
+    $config = Config::JFDI->new(
+        path => "t/assets/order/../",
+        name => "dotdot",
+    );
+    ok($config->load, 'Load a config from a directory path ending with ../');
+    cmp_deeply( $config->get, {
+        test => 'paths ending with ../',
+    } );
+
     $config = Config::JFDI->new( path => "t/assets/order/xyzzy.cnf" );
     cmp_deeply( $config->get, {
         cnf => 1,
