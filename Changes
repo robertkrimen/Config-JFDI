@@ -1,3 +1,6 @@
+0.062 Friday May 29 09:54:22 PDT 2009:
+    - Release because of bad testing environment
+
 0.061 Thursday May 28 15:21:43 PDT 2009:
     - Fix for path extension issue, thanks minty (http://github.com/minty)
 
