@@ -46,5 +46,6 @@ t/assets/xyzzy.pl
 t/assets/xyzzy_catalyst.pl
 t/assets/xyzzy_local.pl
 t/9bug/taking-extension-from-path.t
+t/9bug/rt47237-path-undefined.t
 t/assets/dotdot.conf
 t/assets/dir.cnf/.keep

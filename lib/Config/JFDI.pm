@@ -9,11 +9,11 @@ Config::JFDI - Just * Do it: A Catalyst::Plugin::ConfigLoader-style layer over C
 
 =head1 VERSION
 
-Version 0.062
+Version 0.063
 
 =cut
 
-our $VERSION = '0.062';
+our $VERSION = '0.063';
 
 =head1 SYNPOSIS 
 
@@ -51,6 +51,22 @@ precedence over any other existing configuration file, if any. The precedence ta
 
 Finally, you can override/modify the path search from outside your application, by setting the <NAME>_CONFIG variable outside your application (where <NAME>
 is the uppercase version of what you passed to Config::JFDI->new).
+
+=head1 Config::Loader
+
+We are currently kicking around ideas for a next-generation configuration loader. The goals are:
+
+    * A universal platform for configuration slurping and post-processing
+    * Use Config::Any to do configuration loading
+    * A sane API so that developers can roll their own loader according to the needs of their application
+    * A friendly interface so that users can have it just DWIM
+    * Host/application/instance specific configuration via _local and %ENV
+
+Find more information and contribute at:
+
+Roadmap: L<http://sites.google.com/site/configloader/>
+
+Mailing list: L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/config-loader>
 
 =head1 Behavior change of the 'file' parameter in 0.06
 
@@ -117,7 +133,7 @@ has path_to => qw/reader _path_to lazy_build 1 isa Str/;
 sub _build_path_to {
     my $self = shift;
     return $self->config->{home} if $self->config->{home};
-    return $self->{path} if -d $self->{path};
+    return $self->{path} if defined $self->{path} && -d $self->{path};
     return '.';
 }
 

@@ -1,3 +1,10 @@
+TODO:
+    - What if: Config::JFDI->new() # $name is undefined?
+
+0.063 Tuesday June 23 11:10:15 PDT 2009:
+    - Fixed undefined warning (thanks kmx rt47237)
+    - Added note about Config::Loader
+
 0.062 Friday May 29 09:54:22 PDT 2009:
     - Release because of bad testing environment
 
