@@ -9,11 +9,11 @@ Config::JFDI - Just * Do it: A Catalyst::Plugin::ConfigLoader-style layer over C
 
 =head1 VERSION
 
-Version 0.062
+Version 0.063
 
 =cut
 
-our $VERSION = '0.062';
+our $VERSION = '0.063';
 
 =head1 SYNPOSIS 
 
@@ -117,7 +117,7 @@ has path_to => qw/reader _path_to lazy_build 1 isa Str/;
 sub _build_path_to {
     my $self = shift;
     return $self->config->{home} if $self->config->{home};
-    return $self->{path} if -d $self->{path};
+    return $self->source->path unless $self->source->path_is_file;
     return '.';
 }
 
