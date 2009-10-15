@@ -1,3 +1,6 @@
+0.063_2 Thursday October 15 13:30:27 PDT 2009
+    - Added mechanism to quiet deprecation warnings in a non-author environment
+
 0.063_1 Wednesday October 14 11:32:06 PDT 2009
     - Fixed broken __path_to__ substitution (rt50490)
 
