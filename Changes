@@ -1,6 +1,9 @@
 TODO:
     - What if: Config::JFDI->new() # $name is undefined?
 
+0.063_3 Friday October 16 00:51:31 PDT 2009:
+    - Merged _2 & _1 with 0.063
+
 0.063_2 Thursday October 15 13:30:27 PDT 2009
     - Added mechanism to quiet deprecation warnings in a non-author environment
 
