@@ -1,5 +1,6 @@
 Changes
 MANIFEST
+MANIFEST.SKIP
 META.yml # Will be created by "make dist"
 Makefile.PL
 README
@@ -29,6 +30,8 @@ t/18-open.t
 t/20-substitute.t
 t/21-path-to.t
 t/22-default.t
+t/9bug/rt47237-path-undefined.t
+t/9bug/taking-extension-from-path.t
 t/Test.pm
 t/assets/default.pl
 t/assets/order/xyzzy.cnf
@@ -46,6 +49,5 @@ t/assets/substitute-path-to.pl
 t/assets/xyzzy.pl
 t/assets/xyzzy_catalyst.pl
 t/assets/xyzzy_local.pl
-t/9bug/taking-extension-from-path.t
 t/assets/dotdot.conf
 t/assets/dir.cnf/.keep
