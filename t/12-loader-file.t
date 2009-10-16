@@ -6,13 +6,17 @@ use Test::Most;
 plan qw/no_plan/;
 
 use Config::JFDI;
+use t::Test;
 
 sub has_Config_General {
     return eval "require Config::General;";
 }
 
 {
-    my $config = Config::JFDI->new(file => "t/assets/some_random_file.pl");
+    my $config = Config::JFDI->new(
+        t::Test->deprecation_flag,
+        file => "t/assets/some_random_file.pl"
+    );
 
     ok($config->get);
     is($config->get->{'Controller::Foo'}->{foo},       'bar');
@@ -36,20 +40,28 @@ SKIP: {
         test => 'paths ending with ../',
     } );
 
-    $config = Config::JFDI->new( path => "t/assets/order/xyzzy.cnf" );
+    $config = Config::JFDI->new( 
+        path => "t/assets/order/xyzzy.cnf"
+    );
     cmp_deeply( $config->get, {
         cnf => 1,
         last => 'local_cnf',
         local_cnf => 1,
     } );
 
-    $config = Config::JFDI->new( file => "t/assets/order/xyzzy.cnf" );
+    $config = Config::JFDI->new(
+        t::Test->deprecation_flag,
+        file => "t/assets/order/xyzzy.cnf"
+    );
     cmp_deeply( $config->get, {
         cnf => 1,
         last => 'cnf',
     } );
 
-    $config = Config::JFDI->new( path => "t/assets/order/xyzzy.cnf", no_local => 1 );
+    $config = Config::JFDI->new(
+        path => "t/assets/order/xyzzy.cnf",
+        no_local => 1
+    );
     cmp_deeply( $config->get, {
         cnf => 1,
         last => 'cnf',
@@ -62,7 +74,10 @@ SKIP: {
 
     warning_is { $config = Config::JFDI->new( file => "t/assets/order/xyzzy.cnf", quiet_deprecation => 1 ) } '';
 
-    $config = Config::JFDI->new( file => "t/assets/file-does-not-exist.cnf" );
+    $config = Config::JFDI->new(
+        t::Test->deprecation_flag,
+        file => "t/assets/file-does-not-exist.cnf"
+    );
     cmp_deeply( $config->get, {
     } );
 }

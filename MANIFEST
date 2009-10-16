@@ -17,7 +17,6 @@ inc/Module/Install/WriteAll.pm
 inc/Module/AutoInstall.pm
 inc/Module/Install/AutoInstall.pm
 inc/Module/Install/Include.pm
-t/00-load.t
 t/10-loader.t
 t/11-loader-env.t
 t/12-loader-file.t
@@ -30,6 +29,7 @@ t/18-open.t
 t/20-substitute.t
 t/21-path-to.t
 t/22-default.t
+t/Test.pm
 t/assets/default.pl
 t/assets/order/xyzzy.cnf
 t/assets/order/xyzzy.conf
@@ -42,6 +42,7 @@ t/assets/order/xyzzy_local.pl
 t/assets/path_to.pl
 t/assets/some_random_file.pl
 t/assets/substitute.pl
+t/assets/substitute-path-to.pl
 t/assets/xyzzy.pl
 t/assets/xyzzy_catalyst.pl
 t/assets/xyzzy_local.pl
