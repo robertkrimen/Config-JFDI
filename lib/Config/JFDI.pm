@@ -52,22 +52,6 @@ precedence over any other existing configuration file, if any. The precedence ta
 Finally, you can override/modify the path search from outside your application, by setting the <NAME>_CONFIG variable outside your application (where <NAME>
 is the uppercase version of what you passed to Config::JFDI->new).
 
-=head1 Config::Loader
-
-We are currently kicking around ideas for a next-generation configuration loader. The goals are:
-
-    * A universal platform for configuration slurping and post-processing
-    * Use Config::Any to do configuration loading
-    * A sane API so that developers can roll their own loader according to the needs of their application
-    * A friendly interface so that users can have it just DWIM
-    * Host/application/instance specific configuration via _local and %ENV
-
-Find more information and contribute at:
-
-Roadmap: L<http://sites.google.com/site/configloader/>
-
-Mailing list: L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/config-loader>
-
 =head1 Behavior change of the 'file' parameter in 0.06
 
 In previous versions, Config::JFDI would treat the file parameter as a path parameter, stripping off the extension (ignoring it) and globbing what remained against all the extensions that Config::Any could provide. That is, it would do this:
@@ -133,11 +117,7 @@ has path_to => qw/reader _path_to lazy_build 1 isa Str/;
 sub _build_path_to {
     my $self = shift;
     return $self->config->{home} if $self->config->{home};
-<<<<<<< HEAD:lib/Config/JFDI.pm
-    return $self->{path} if defined $self->{path} && -d $self->{path};
-=======
     return $self->source->path unless $self->source->path_is_file;
->>>>>>> 45f5808824821565b2de7d08e6cb320076a7459c:lib/Config/JFDI.pm
     return '.';
 }
 

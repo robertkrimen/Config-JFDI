@@ -1,10 +1,7 @@
-#!/usr/bin/env perl
-
 use strict;
 use warnings;
 
 use Test::More;
-
 plan qw/no_plan/;
 
 use Config::JFDI::Source::Loader;

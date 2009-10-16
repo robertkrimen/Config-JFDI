@@ -49,23 +49,6 @@ DESCRIPTION
     application (where <NAME> is the uppercase version of what you passed to
     Config::JFDI->new).
 
-Config::Loader
-    We are currently kicking around ideas for a next-generation
-    configuration loader. The goals are:
-
-        * A universal platform for configuration slurping and post-processing
-        * Use Config::Any to do configuration loading
-        * A sane API so that developers can roll their own loader according to the needs of their application
-        * A friendly interface so that users can have it just DWIM
-        * Host/application/instance specific configuration via _local and %ENV
-
-    Find more information and contribute at:
-
-    Roadmap: <http://sites.google.com/site/configloader/>
-
-    Mailing list:
-    <http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/config-loader>
-
 Behavior change of the 'file' parameter in 0.06
     In previous versions, Config::JFDI would treat the file parameter as a
     path parameter, stripping off the extension (ignoring it) and globbing
