@@ -3,7 +3,7 @@ NAME
     layer over Config::Any
 
 VERSION
-    Version 0.063_3
+    Version 0.064
 
 SYNPOSIS
         use Config::JFDI;
