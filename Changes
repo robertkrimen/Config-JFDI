@@ -1,6 +1,9 @@
 TODO:
     - What if: Config::JFDI->new() # $name is undefined?
 
+0.064 Sunday October 18 21:33:52 PDT 2009:
+    - Non-development release
+
 0.063_3 Friday October 16 00:51:31 PDT 2009:
     - Merged _2 & _1 with 0.063
 
