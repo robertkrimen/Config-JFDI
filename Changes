@@ -1,6 +1,11 @@
 TODO:
     - What if: Config::JFDI->new() # $name is undefined?
 
+0.064_1 Tuesday December 28 17:11:22 PST 2010:
+    - Fixed bug rt53886 (thanks mzrinsky & RUSSELJ)
+    - Add Config::General as a prerequisite because it's so useful
+    - Using Dist::Zilla for release process
+
 0.064 Sunday October 18 21:33:52 PDT 2009:
     - Non-development release
 

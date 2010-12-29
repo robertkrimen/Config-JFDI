@@ -180,9 +180,12 @@ sub BUILD {
 
     my ($source, %source);
     if ($given->{file}) {
-        carp "The behavior of the 'file' option has changed, pass in 'quiet_deprecation' or 'no_06_warning' to disable this warning"
-            unless $given->{quiet_deprecation} || $given->{no_06_warning};
-        carp "Warning, overriding path setting with file (\"$given->{file}\" instead of \"$given->{path}\")" if $given->{path};
+
+        if ( 0 ) { # Deprecate the deprecation warning
+            carp "The behavior of the 'file' option has changed, pass in 'quiet_deprecation' or 'no_06_warning' to disable this warning"
+                unless $given->{quiet_deprecation} || $given->{no_06_warning};
+            carp "Warning, overriding path setting with file (\"$given->{file}\" instead of \"$given->{path}\")" if $given->{path};
+        }
         $given->{path} = $given->{file};
         $source{path_is_file} = 1;
     }
@@ -203,7 +206,8 @@ sub BUILD {
             $source{$_} = $given->{$_} if exists $given->{$_};
         }
 
-        carp "Warning, 'local_suffix' will be ignored if 'file' is given, use 'path' instead" if exists $source{local_suffix};
+        carp "Warning, 'local_suffix' will be ignored if 'file' is given, use 'path' instead" if
+            exists $source{local_suffix} && exists $given->{file};
 
         $source{local_suffix} = $given->{config_local_suffix} if $given->{config_local_suffix};
 
