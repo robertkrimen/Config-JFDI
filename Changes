@@ -1,6 +1,10 @@
 TODO:
     - What if: Config::JFDI->new() # $name is undefined?
 
+0.064_2 Wednesday December 29 13:43:11 PST 2010:
+    - Conversion to Any::Moose
+    - Drop unneeded deprecation-warning test
+
 0.064_1 Tuesday December 28 17:11:22 PST 2010:
     - Fixed bug rt53886 (thanks mzrinsky & RUSSELJ)
     - Add Config::General as a prerequisite because it's so useful
