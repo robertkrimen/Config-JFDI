@@ -1,19 +1,8 @@
 package Config::JFDI;
+# ABSTRACT: Just * Do it: A Catalyst::Plugin::ConfigLoader-style layer over Config::Any
 
 use warnings;
 use strict;
-
-=head1 NAME
-
-Config::JFDI - Just * Do it: A Catalyst::Plugin::ConfigLoader-style layer over Config::Any
-
-=head1 VERSION
-
-Version 0.064
-
-=cut
-
-our $VERSION = '0.064';
 
 =head1 SYNPOSIS 
 
@@ -423,72 +412,18 @@ sub _load {
     $self->{_config} = Hash::Merge::Simple->merge($self->_config, $hash);
 }
 
-=head1 AUTHOR
-
-Robert Krimen, C<< <rkrimen at cpan.org> >>
-
 =head1 SEE ALSO
 
-L<Catalyst::Plugin::ConfigLoader>, L<Config::Any>, L<Catalyst>
+L<Catalyst::Plugin::ConfigLoader>
 
-=head1 SOURCE
+L<Config::Any>
 
-You can contribute or fork this project via GitHub:
+L<Catalyst>
 
-L<http://github.com/robertkrimen/config-jfdi/tree/master>
+L<Config::Merge>
 
-    git clone git://github.com/robertkrimen/config-jfdi.git PACKAGE
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-config-jfdi at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Config-JFDI>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Config::JFDI
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-JFDI>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Config-JFDI>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Config-JFDI>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Config-JFDI>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008 Robert Krimen, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
+L<Config::General>
 
 =cut
 
-1; # End of Config::JFDI
+1;

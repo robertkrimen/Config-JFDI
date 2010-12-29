@@ -1,8 +1,7 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
-
-use Test::More;
-plan qw/no_plan/;
+use Test::Most;
 
 use Config::JFDI::Source::Loader;
 
@@ -15,4 +14,4 @@ is( file_extension '.../.', undef );
 is( file_extension 't/assets/order/..', undef );
 is( file_extension 't/assets/dir.cnf', undef );
 
-1;
+done_testing;

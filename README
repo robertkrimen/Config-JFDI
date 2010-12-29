@@ -3,7 +3,27 @@ NAME
     layer over Config::Any
 
 VERSION
-    Version 0.064
+    version 0.0064
+
+DESCRIPTION
+    Config::JFDI is an implementation of Catalyst::Plugin::ConfigLoader that
+    exists outside of Catalyst.
+
+    Essentially, Config::JFDI will scan a directory for files matching a
+    certain name. If such a file is found which also matches an extension
+    that Config::Any can read, then the configuration from that file will be
+    loaded.
+
+    Config::JFDI will also look for special files that end with a "_local"
+    suffix. Files with this special suffix will take precedence over any
+    other existing configuration file, if any. The precedence takes place by
+    merging the local configuration with the "standard" configuration via
+    Hash::Merge::Simple.
+
+    Finally, you can override/modify the path search from outside your
+    application, by setting the <NAME>_CONFIG variable outside your
+    application (where <NAME> is the uppercase version of what you passed to
+    Config::JFDI->new).
 
 SYNPOSIS
         use Config::JFDI;
@@ -28,26 +48,6 @@ SYNPOSIS
     To later reload your configuration, fresh from disk:
 
         $config->reload;
-
-DESCRIPTION
-    Config::JFDI is an implementation of Catalyst::Plugin::ConfigLoader that
-    exists outside of Catalyst.
-
-    Essentially, Config::JFDI will scan a directory for files matching a
-    certain name. If such a file is found which also matches an extension
-    that Config::Any can read, then the configuration from that file will be
-    loaded.
-
-    Config::JFDI will also look for special files that end with a "_local"
-    suffix. Files with this special suffix will take precedence over any
-    other existing configuration file, if any. The precedence takes place by
-    merging the local configuration with the "standard" configuration via
-    Hash::Merge::Simple.
-
-    Finally, you can override/modify the path search from outside your
-    application, by setting the <NAME>_CONFIG variable outside your
-    application (where <NAME> is the uppercase version of what you passed to
-    Config::JFDI->new).
 
 Config::Loader
     We are currently kicking around ideas for a next-generation
@@ -190,53 +190,23 @@ METHODS
     You can define your own substitutions by supplying the substitute option
     to ->new
 
-AUTHOR
-    Robert Krimen, "<rkrimen at cpan.org>"
-
 SEE ALSO
-    Catalyst::Plugin::ConfigLoader, Config::Any, Catalyst
+    Catalyst::Plugin::ConfigLoader
 
-SOURCE
-    You can contribute or fork this project via GitHub:
+    Config::Any
 
-    <http://github.com/robertkrimen/config-jfdi/tree/master>
+    Catalyst
 
-        git clone git://github.com/robertkrimen/config-jfdi.git PACKAGE
+    Config::Merge
 
-BUGS
-    Please report any bugs or feature requests to "bug-config-jfdi at
-    rt.cpan.org", or through the web interface at
-    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Config-JFDI>. I will be
-    notified, and then you'll automatically be notified of progress on your
-    bug as I make changes.
+    Config::General
 
-SUPPORT
-    You can find documentation for this module with the perldoc command.
+AUTHOR
+    Robert Krimen <robertkrimen@gmail.com>
 
-        perldoc Config::JFDI
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Robert Krimen.
 
-    You can also look for information at:
-
-    *   RT: CPAN's request tracker
-
-        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-JFDI>
-
-    *   AnnoCPAN: Annotated CPAN documentation
-
-        <http://annocpan.org/dist/Config-JFDI>
-
-    *   CPAN Ratings
-
-        <http://cpanratings.perl.org/d/Config-JFDI>
-
-    *   Search CPAN
-
-        <http://search.cpan.org/dist/Config-JFDI>
-
-ACKNOWLEDGEMENTS
-COPYRIGHT & LICENSE
-    Copyright 2008 Robert Krimen, all rights reserved.
-
-    This program is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 
