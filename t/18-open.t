@@ -31,7 +31,6 @@ sub has_Config_General {
 
 {
     my $config = Config::JFDI->new(
-        t::Test->deprecation_flag,
         file => 't/assets/some_random_file.pl'
     );
     warning_like { $config->open( '...' ) } qr/You called ->open on an instantiated object with arguments/;

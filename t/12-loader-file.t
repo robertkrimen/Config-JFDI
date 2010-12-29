@@ -14,7 +14,6 @@ sub has_Config_General {
 
 {
     my $config = Config::JFDI->new(
-        t::Test->deprecation_flag,
         file => "t/assets/some_random_file.pl"
     );
 
@@ -50,7 +49,6 @@ SKIP: {
     } );
 
     $config = Config::JFDI->new(
-        t::Test->deprecation_flag,
         file => "t/assets/order/xyzzy.cnf"
     );
     cmp_deeply( $config->get, {
@@ -67,15 +65,13 @@ SKIP: {
         last => 'cnf',
     } );
 
-    warning_like { $config = Config::JFDI->new( file => "t/assets/order/xyzzy.cnf", ) }
-        qr/The behavior of the 'file' option has changed, pass in 'quiet_deprecation' or 'no_06_warning' to disable this warning/;
+    warning_is { $config = Config::JFDI->new( file => "t/assets/order/xyzzy.cnf", ) } undef;
 
     warning_is { $config = Config::JFDI->new( file => "t/assets/order/xyzzy.cnf", no_06_warning => 1 ) } '';
 
     warning_is { $config = Config::JFDI->new( file => "t/assets/order/xyzzy.cnf", quiet_deprecation => 1 ) } '';
 
     $config = Config::JFDI->new(
-        t::Test->deprecation_flag,
         file => "t/assets/file-does-not-exist.cnf"
     );
     cmp_deeply( $config->get, {
