@@ -1,7 +1,6 @@
 package Config::JFDI::Source::Loader;
 
 use Moose;
-use MooseX::AttributeHelpers;
 
 use Config::Any;
 use Carp;
@@ -26,9 +25,7 @@ has env_lookup => qw/is ro/, default => sub { [] };
 
 has path_is_file => qw/is ro default 0/;
 
-has _found => qw/metaclass Collection::Array is rw isa ArrayRef/, provides => {qw/
-    elements found
-/};
+has _found => qw/ is rw isa ArrayRef /;
 
 sub _env(@) {
     my $key = uc join "_", @_;
@@ -84,6 +81,12 @@ sub read {
     }
 
     return $self->no_local ? @cfg : (@cfg, @local_cfg);
+}
+
+sub found {
+    my $self = shift;
+    die if @_;
+    return @{ $self->_found };
 }
 
 around found => sub {
