@@ -3,7 +3,7 @@ NAME
     layer over Config::Any
 
 VERSION
-    version 0.0064_2
+    version 0.0065
 
 DESCRIPTION
     Config::JFDI is an implementation of Catalyst::Plugin::ConfigLoader that
