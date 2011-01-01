@@ -1,6 +1,9 @@
 TODO:
     - What if: Config::JFDI->new() # $name is undefined?
 
+0.065 Saturday January 01 14:10:43 PST 2011:
+    - Release because of mis-version
+
 0.065 Friday December 31 14:28:21 PST 2010
     - Non-development release
 
