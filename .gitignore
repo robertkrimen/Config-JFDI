@@ -2,3 +2,4 @@ Config-JFDI-*
 Makefile
 inc
 local
+.build
