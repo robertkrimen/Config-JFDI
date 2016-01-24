@@ -77,7 +77,8 @@ If you *do* want the original behavior, simply pass in the file parameter as the
 
 =cut
 
-use Any::Moose;
+use Moo;
+use Types::Standard qw(Str HashRef);
 
 use Config::JFDI::Source::Loader;
 use Config::JFDI::Carp;
@@ -89,25 +90,25 @@ use Sub::Install;
 use Data::Visitor::Callback;
 use Clone qw//;
 
-has package => qw/ is ro isa Str /;
+has package => qw/ is ro /, isa => Str;
 
 has source => qw/ is ro /, handles => [qw/ driver local_suffix no_env env_lookup path found /];
 
 has load_once => qw/ is ro required 1 /, default => 1;
 
-has loaded => qw/ is ro required 1 /, default => 0;
+has loaded => qw/ is ro /, default => 0;
 
-has substitution => qw/ reader _substitution lazy_build 1 isa HashRef /;
+has substitution => qw/ is lazy reader _substitution /, isa => HashRef;
 sub _build_substitution {
     return {};
 }
 
-has default => qw/ is ro lazy_build 1 isa HashRef /;
+has default => qw/ is lazy /, isa => HashRef;
 sub _build_default {
     return {};
 }
 
-has path_to => qw/ reader _path_to lazy_build 1 isa Str /;
+has path_to => qw/ is lazy reader _path_to /, isa => Str;
 sub _build_path_to {
     my $self = shift;
     return $self->config->{home} if $self->config->{home};
@@ -115,7 +116,7 @@ sub _build_path_to {
     return '.';
 }
 
-has _config => qw/ is rw isa HashRef /;
+has _config => qw/ is rw /, isa => HashRef;
 
 =head2 $config = Config::JFDI->new(...)
 
