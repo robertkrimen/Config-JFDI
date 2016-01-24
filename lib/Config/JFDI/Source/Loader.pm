@@ -1,31 +1,32 @@
 package Config::JFDI::Source::Loader;
 
-use Any::Moose;
+use Moo;
+use Types::Standard qw(Str ScalarRef ArrayRef);
 
 use Config::Any;
 use Carp;
 use List::MoreUtils qw/ any /;
 
-has name => qw/ is ro required 0 isa Str|ScalarRef /;
+has name => qw/ is ro required 0 /, isa => Str|ScalarRef;
 
 has path => qw/ is ro default . /;
 
-has driver => qw/ is ro lazy_build 1 /;
+has driver => qw/ is lazy /;
 sub _build_driver {
     return {};
 }
 
-has local_suffix => qw/ is ro required 1 lazy 1 default local /;
+has local_suffix => qw/ is lazy required 1 default local /;
 
-has no_env => qw/ is ro required 1 /, default => 0;
+has no_env => qw/ is ro /, default => 0;
 
-has no_local => qw/ is ro required 1 /, default => 0;
+has no_local => qw/ is ro /, default => 0;
 
 has env_lookup => qw/ is ro /, default => sub { [] };
 
 has path_is_file => qw/ is ro default 0 /;
 
-has _found => qw/ is rw isa ArrayRef /;
+has _found => qw/ is rw /,  isa => ArrayRef;
 
 sub _env (@) {
     my $key = uc join "_", @_;
